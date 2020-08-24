@@ -15,7 +15,30 @@ For those wishing to just run
 - Launch MSFS2020  and begin a flight
 - Ensure your Saitek Switch Flight Panel is plugged in 
 - Close by exiting bash window/console 
-
+# Coming Soon 
+- Map switches to different events 
+***Note*** All switches do work, but only for their intended action.
+`Supported Switches Currently: 
+MASTER_BAT ,
+	MASTER_ALT,
+	AVIONICS_MASTER ,
+	FUEL_PUMP ,
+	DE_ICE ,
+	LANDING_GEAR ,
+	PITOT_HEAT ,
+	MAG_LEFT ,
+	MAG_RIGHT ,
+	MAG_OFF ,
+	MAG_START ,
+	MAG_ALL ,
+	COWL_FLAP  ,
+	LIGHT_PANEL ,
+	LIGHT_BEACON ,
+	LIGHT_NAV ,
+	LIGHT_STROBE,
+	LIGHT_TAXI ,
+	LIGHT_LANDING
+`
 # Build and Run
 ### Requirments 
 - [Windows Development Kit 10 ](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/) **not included**
