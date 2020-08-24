@@ -14,6 +14,7 @@ For those wishing to just run
 - Locate the **SaitekPanelMSFS2020/SaitekPanel** folder
 - Launch MSFS2020  and begin a flight
 - Ensure your Saitek Switch Flight Panel is plugged in 
+- Run the **SaitekSwitchPanel.exe**
 - Close by exiting bash window/console 
 # Coming Soon 
 - Map switches to different events 
