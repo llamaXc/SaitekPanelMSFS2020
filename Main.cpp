@@ -168,8 +168,8 @@ bool getLatestToggleSwitchStates() {
 					stillLooking = false;
 
 					for (int i = 0; i < (int)pObjData->dwDefineCount; i++) {
-								std::cout << panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].string_id << " " << panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].sim_state <<
-								" " << panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].state << std::endl;
+						//		std::cout << panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].string_id << " " << panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].sim_state <<
+						//		" " << panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].state << std::endl;
 					
 						gotData = true; // This is good, we can now read our data and sync with the sim
 						panel.switches[static_cast<SWITCH_NAME>(pS->datum[i].id)].correct_from_sim = true;
@@ -253,6 +253,13 @@ hid_device* findSaitekPanel() {
 	return hid_open(vendor_id, product_id, NULL); // Return Opened USB Device 
 }
 
+void shutdown() {
+
+	hid_close(handle);
+	hid_exit();
+
+	SimConnect_Close(hSimConnect);
+}
 
 //Main
 int __cdecl _tmain(int argc, _TCHAR* argv[]){
@@ -266,6 +273,10 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 	//Attempt to see if sim is open
 	if (debugTestMode == false && FAILED(SimConnect_Open(&hSimConnect, "Saitek Panel", NULL, 0, 0, 0))){
 		printf("\n\n\033[0;31mWarning: \033[0mCould not find Microsoft Flight Simulator 2020\nPlease ensure it is running first then relaunch this application.\n\n");
+		std::string ack;
+		printf("\n Press any key and hit enter to close\n");
+		std::cin >> ack;
+
 		return -1;
 	}
 
@@ -325,18 +336,33 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 
 	if (!loadStatus && debugTestMode == false) {
 		printf("\n\nFailed to connect to sim and get inital states\n");
+		std::string ack;
+		printf("\n Press any key and hit enter to close\n");
+		std::cin >> ack;
+		shutdown();
 		return 0;
 	}
 
 	/********************************* CONFIGURE HID USB DEVICE ***************************************/
-	if (hid_init())
-		return -1;
+	if (hid_init()) {
+		printf("\nFailed to open HID device\n\n");
+		std::string ack;
+		printf("\n Press any key and hit enter to close\n");
+		std::cin >> ack;
+		shutdown();
+		return 0;
+	}
 
 	handle = findSaitekPanel();
 	if (!handle) {
 		printf("\n\nFailed to locate \'Saitek Pro Flight Switch Panel\'\n");
 		printf("Leave an issue and I wil fix this, please include the output from the application.\n\n");
-		return -1;
+
+		std::string ack;
+		printf("\n Press any key and hit enter to close\n");
+		std::cin >> ack;
+		shutdown();
+		return 0;
 	}
 	
 	//Set up nonblocking and ready the bfufers
@@ -437,10 +463,6 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 		Sleep(10); // CPU Lives Matter 
 	}
 
-
-	hid_close(handle);
-	hid_exit();
-
-	SimConnect_Close(hSimConnect);
+	shutdown();
 	return 0;
 }
