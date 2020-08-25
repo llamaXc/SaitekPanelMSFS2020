@@ -52,7 +52,6 @@ struct InitialSwitchDatum {
 //NOTE THIS MUST MATCH MAX ITEM RETURNED
 struct InitialState {
 	BOOL master_alt;
-	BOOL master_bat;
 	BOOL fuel_pump;
 	BOOL deice;
 	BOOL strobe;
@@ -278,7 +277,6 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 	/******************************************* CONFIGURE SIMCONNECT DATA FIELDS ******************************************************/
 	//Define data for inital state request
 	hr = SimConnect_AddToDataDefinition(hSimConnect, INITIAL_STATE, "GENERAL ENG MASTER ALTERNATOR", "BOOL", SIMCONNECT_DATATYPE_INT32, 0, SWITCH_NAME::MASTER_ALT);
-	hr = SimConnect_AddToDataDefinition(hSimConnect, INITIAL_STATE, "ELECTRICAL MASTER BATTERY", "BOOL", SIMCONNECT_DATATYPE_INT32, 0, SWITCH_NAME::MASTER_BAT);
 	hr = SimConnect_AddToDataDefinition(hSimConnect, INITIAL_STATE, "GENERAL ENG FUEL PUMP SWITCH", "BOOL", SIMCONNECT_DATATYPE_INT32, 0, SWITCH_NAME::FUEL_PUMP);
 	hr = SimConnect_AddToDataDefinition(hSimConnect, INITIAL_STATE, "STRUCTURAL DEICE SWITCH", "BOOL", SIMCONNECT_DATATYPE_INT32, 0, SWITCH_NAME::DE_ICE);
 	hr = SimConnect_AddToDataDefinition(hSimConnect, INITIAL_STATE, "LIGHT STROBE", "BOOL", SIMCONNECT_DATATYPE_INT32, 0, SWITCH_NAME::LIGHT_STROBE);
@@ -408,7 +406,11 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 
 		//Listen to Saitek Panel and read buffer states
 		if (hid_read(handle, buf, sizeof(buf)) >= 2) {
-	
+			for (int i = 0; i < 3; i++) {
+				printf("%d ", buf[i]);
+			}
+			printf("\n");
+
 			//If this is the very first load, then update the panel and configure the program to display correct states 
 			//The next step in this program will ask user to toggle any switch to confirm. 
 			if (loadedInitialSwitchStates == false) {
