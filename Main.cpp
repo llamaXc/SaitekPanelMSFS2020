@@ -91,11 +91,11 @@ void set_led_color(LED_COLOR color) {
 void transmit_states() {
 	for (auto& cur_switch_value : panel.switches) {
 		Switch* cur_switch = &cur_switch_value.second;
-		BOOL transmit = false;
 		BOOL allow_event_update = true;
-		if (cur_switch->update || cur_switch->correct_from_sim) {
 
+		if (cur_switch->update || cur_switch->correct_from_sim) {
 			if (cur_switch->is_event && !cur_switch->toggle_only) {
+
 				//Moving a mag causes 2 switch update states. 
 				//Since its a knob, only send the new state position
 				if (cur_switch->id == SWITCH_NAME::MAG_ALL
@@ -108,36 +108,31 @@ void transmit_states() {
 					}
 				}
 
+				//Check for landing gear state and if we should send gear up or gear down handle requestt
+				if (cur_switch->id == SWITCH_NAME::LANDING_GEAR) {
+					if (cur_switch->state == 1) {
+						set_led_color(LED_COLOR::GREEN);
+						SimConnect_TransmitClientEvent(hSimConnect, 0, SWITCH_NAME::KEY_GEAR_DOWN, 1, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
+					}else {
+						set_led_color(LED_COLOR::OFF);
+						SimConnect_TransmitClientEvent(hSimConnect, 0, SWITCH_NAME::KEY_GEAR_UP, 1, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
+					}
+				}
+
 				if (allow_event_update) {
 					SwitchStruct switch_to_send;
 					switch_to_send.state = cur_switch->state;
-					cur_switch->times_switched++;
-					transmit = true;
 					SimConnect_TransmitClientEvent(hSimConnect, 0, cur_switch->action_id, switch_to_send.state, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
 				}
 			}else if (cur_switch->toggle_only) {
 				//sim state is lagging by 1 second 
 				if (cur_switch->sim_state != cur_switch->state) {
-					cur_switch->times_switched++;
-					transmit = true;
 					cur_switch->sim_state = cur_switch->state;
 					SimConnect_TransmitClientEvent(hSimConnect, 0, cur_switch->action_id, 1, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
 				}
-				
-		
 			}else {
-				cur_switch->times_switched++;
-				transmit = true;
 				SwitchStruct switch_to_send;
 				switch_to_send.state = cur_switch->state;
-				if (cur_switch->id == SWITCH_NAME::LANDING_GEAR) {
-					switch_to_send.state += 1;
-					if (cur_switch->state == 1) {
-						set_led_color(LED_COLOR::GREEN);
-					}else { 
-						set_led_color(LED_COLOR::OFF);
-					}
-				}
 				SimConnect_SetDataOnSimObject(hSimConnect, cur_switch->action_id, SIMCONNECT_OBJECT_ID_USER, 0, 0, sizeof(switch_to_send), &switch_to_send);
 			}
 
@@ -316,6 +311,8 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 	hr = SimConnect_MapClientEventToSimEvent(hSimConnect, KEY_TOGGLE_BEACON_LIGHTS, "TOGGLE_BEACON_LIGHTS");
 	hr = SimConnect_MapClientEventToSimEvent(hSimConnect, KEY_TOGGLE_TAXI_LIGHTS, "TOGGLE_TAXI_LIGHTS");
 	hr = SimConnect_MapClientEventToSimEvent(hSimConnect, KEY_PANEL_LIGHTS_TOGGLE, "PANEL_LIGHTS_TOGGLE");
+	hr = SimConnect_MapClientEventToSimEvent(hSimConnect, KEY_GEAR_UP, "GEAR_UP");
+	hr = SimConnect_MapClientEventToSimEvent(hSimConnect, KEY_GEAR_DOWN, "GEAR_DOWN");
 
 
 	hr = SimConnect_RequestDataOnSimObject(hSimConnect, INITIAL_STATE_REQUEST, INITIAL_STATE,

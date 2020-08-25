@@ -193,7 +193,7 @@ Panel::Panel() {
 	gear.times_switched = 0;
 	gear.last_state = 0;
 	gear.toggle_only = 0;
-	gear.is_event = 0;
+	gear.is_event = 1;
 	gear.row = 2;
 	gear.id = SWITCH_NAME::LANDING_GEAR;
 	gear.action_id = EVENT_ID::SET_GEAR;

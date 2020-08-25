@@ -68,7 +68,9 @@ static enum  SWITCH_NAME {
 	LIGHT_NAV = 15,
 	LIGHT_STROBE = 16,
 	LIGHT_TAXI = 17,
-	LIGHT_LANDING = 18
+	LIGHT_LANDING = 18,
+	KEY_GEAR_UP = 19,
+	KEY_GEAR_DOWN = 20
 };
 
 struct Switch {
