@@ -406,11 +406,7 @@ int __cdecl _tmain(int argc, _TCHAR* argv[]){
 
 		//Listen to Saitek Panel and read buffer states
 		if (hid_read(handle, buf, sizeof(buf)) >= 2) {
-			for (int i = 0; i < 3; i++) {
-				printf("%d ", buf[i]);
-			}
-			printf("\n");
-
+	
 			//If this is the very first load, then update the panel and configure the program to display correct states 
 			//The next step in this program will ask user to toggle any switch to confirm. 
 			if (loadedInitialSwitchStates == false) {
